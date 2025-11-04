@@ -69,7 +69,8 @@ export default function AdminHRDashboard() {
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : `http://${window.location.hostname}:5000`;
+      : "https://office-attendance-system-backend.onrender.com";
+
 
   // ✅ Wrap fetchAll with useCallback to fix ESLint warning
   const fetchAll = useCallback(async () => {

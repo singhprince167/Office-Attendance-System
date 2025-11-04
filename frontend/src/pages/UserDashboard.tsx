@@ -30,7 +30,8 @@ export default function UserDashboard() {
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : `http://${window.location.hostname}:5000`;
+      : "https://office-attendance-system-backend.onrender.com";
+
 
   // ✅ Fetch User Profile
   const fetchUserProfile = useCallback(async () => {
@@ -152,11 +153,10 @@ export default function UserDashboard() {
             <button
               onClick={() => markAttendance("entry")}
               disabled={attendance?.entryTime !== undefined}
-              className={`px-4 py-2 rounded ${
-                attendance?.entryTime
+              className={`px-4 py-2 rounded ${attendance?.entryTime
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-blue-600 text-white"
-              }`}
+                }`}
             >
               Mark Entry
             </button>
@@ -164,11 +164,10 @@ export default function UserDashboard() {
             <button
               onClick={() => markAttendance("exit")}
               disabled={!attendance?.entryTime || attendance?.exitTime !== undefined}
-              className={`px-4 py-2 rounded ${
-                !attendance?.entryTime || attendance?.exitTime
+              className={`px-4 py-2 rounded ${!attendance?.entryTime || attendance?.exitTime
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-red-600 text-white"
-              }`}
+                }`}
             >
               Mark Exit
             </button>
