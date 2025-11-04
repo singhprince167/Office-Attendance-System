@@ -106,7 +106,7 @@ export default function UserDashboard() {
       } else {
         alert(`You are ${Math.round(distance)}m away. Must be within ${GEOFENCE_METERS}m to mark entry.`);
       }
-    }, () => {
+    }, (err) => {
       alert("Could not get location. Allow location access.");
     }, { enableHighAccuracy: true, maximumAge: 10000 });
   };
@@ -136,7 +136,7 @@ export default function UserDashboard() {
       } else {
         alert(`You are ${Math.round(distance)}m away. Must be within ${GEOFENCE_METERS}m to mark exit.`);
       }
-    }, () => {
+    }, (err) => {
       alert("Could not get location. Allow location access.");
     }, { enableHighAccuracy: true, maximumAge: 10000 });
   };

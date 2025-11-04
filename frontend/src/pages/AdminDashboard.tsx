@@ -67,10 +67,9 @@ export default function AdminHRDashboard() {
   const token = localStorage.getItem("token");
 
   const BASE_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://office-attendance-system-backend.onrender.com";
-
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : `http://${window.location.hostname}:5000`;
 
   // ✅ Wrap fetchAll with useCallback to fix ESLint warning
   const fetchAll = useCallback(async () => {

@@ -11,8 +11,7 @@ export default function Login() {
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "https://office-attendance-system-backend.onrender.com";
-
+      : `http://${window.location.hostname}:5000`;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
