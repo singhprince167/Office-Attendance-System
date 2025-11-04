@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -21,7 +21,6 @@ export default function UserDashboard() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  // Office location (your provided coordinates)
   const OFFICE_LOCATION = { lat: 26.881061, lng: 80.982332 };
   const GEOFENCE_METERS = 50;
 
@@ -41,7 +40,7 @@ export default function UserDashboard() {
     return R * c;
   }
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
@@ -49,31 +48,31 @@ export default function UserDashboard() {
       setUser(res.data);
       localStorage.setItem("name", res.data.name);
     } catch (err) { console.error(err); }
-  };
+  }, [token]);
 
-  const fetchTodayAttendance = async () => {
+  const fetchTodayAttendance = useCallback(async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/attendance/today", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAttendance(res.data);
     } catch (err) { console.error(err); }
-  };
+  }, [token]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/tasks/my-tasks", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(res.data);
     } catch (err) { console.error(err); }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchUserProfile();
     fetchTodayAttendance();
     fetchTasks();
-  }, []);
+  }, [fetchUserProfile, fetchTodayAttendance, fetchTasks]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -107,7 +106,7 @@ export default function UserDashboard() {
       } else {
         alert(`You are ${Math.round(distance)}m away. Must be within ${GEOFENCE_METERS}m to mark entry.`);
       }
-    }, (err) => {
+    }, () => {
       alert("Could not get location. Allow location access.");
     }, { enableHighAccuracy: true, maximumAge: 10000 });
   };
@@ -137,7 +136,7 @@ export default function UserDashboard() {
       } else {
         alert(`You are ${Math.round(distance)}m away. Must be within ${GEOFENCE_METERS}m to mark exit.`);
       }
-    }, (err) => {
+    }, () => {
       alert("Could not get location. Allow location access.");
     }, { enableHighAccuracy: true, maximumAge: 10000 });
   };

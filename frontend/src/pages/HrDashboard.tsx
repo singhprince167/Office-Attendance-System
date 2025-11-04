@@ -1,5 +1,5 @@
 // src/pages/AdminHRDashboard.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 interface IUser {
@@ -71,8 +71,8 @@ export default function AdminHRDashboard() {
       ? "http://localhost:5000"
       : `http://${window.location.hostname}:5000`;
 
-  // Fetch all users, attendance, and tasks
-  const fetchAll = async () => {
+  // ✅ Wrap fetchAll with useCallback to fix ESLint warning
+  const fetchAll = useCallback(async () => {
     try {
       const resUsers = await axios.get(`${BASE_URL}/api/auth/users`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +91,7 @@ export default function AdminHRDashboard() {
     } catch (err) {
       console.error("fetchAll error:", err);
     }
-  };
+  }, [BASE_URL, token]); // ✅ Dependencies added
 
   // Logout function
   const handleLogout = () => {
@@ -105,23 +105,19 @@ export default function AdminHRDashboard() {
 
     const resetTimer = () => {
       if (timeout) clearTimeout(timeout);
-      // Set auto-logout after 10 minutes of inactivity
       timeout = setTimeout(() => {
         alert("You have been logged out due to inactivity.");
         handleLogout();
       }, 2 * 60 * 1000); // 2 minutes
     };
 
-    // Listen to user activity: mousemove, keydown, scroll, click
     window.addEventListener("mousemove", resetTimer);
     window.addEventListener("keydown", resetTimer);
     window.addEventListener("scroll", resetTimer);
     window.addEventListener("click", resetTimer);
 
-    // Initialize timer
     resetTimer();
 
-    // Cleanup event listeners on component unmount
     return () => {
       if (timeout) clearTimeout(timeout);
       window.removeEventListener("mousemove", resetTimer);
@@ -131,10 +127,10 @@ export default function AdminHRDashboard() {
     };
   }, []);
 
-  // Initial fetch
+  // ✅ useEffect updated with fetchAll dependency
   useEffect(() => {
     fetchAll();
-  }, []);
+  }, [fetchAll]);
 
   // Register new user
   const registerUser = async () => {
@@ -266,7 +262,7 @@ export default function AdminHRDashboard() {
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-4">
         <h1 className="text-2xl font-bold mb-2 sm:mb-0 text-gray-800">
-          HR Dashboard
+          Admin Dashboard
         </h1>
         <div className="flex gap-2 flex-wrap">
           <button
@@ -502,12 +498,9 @@ export default function AdminHRDashboard() {
 
       {/* Tasks Table */}
       <div className="bg-white p-4 rounded shadow max-h-[60vh]">
-        {/* Header stays outside scroll */}
         <h2 className="text-lg font-semibold mb-2 text-gray-700">
           All Tasks (Pending & Completed)
         </h2>
-
-        {/* Scrollable container */}
         <div className="overflow-x-auto overflow-y-auto max-h-[50vh]">
           <table className="w-full border text-sm sm:text-base table-auto">
             <thead className="bg-gray-200 sticky top-0 z-20">
@@ -520,19 +513,27 @@ export default function AdminHRDashboard() {
               </tr>
             </thead>
             <tbody>
-              {tasks.map((t) => (
-                <tr key={t._id} className="hover:bg-gray-50">
-                  <td className="p-2 border break-words">{t.title}</td>
-                  <td className="p-2 border break-words whitespace-normal">
-                    <ReadMore text={t.description} />
-                  </td>
-                  <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
-                  <td className="p-2 border capitalize break-words">{t.status || "pending"}</td>
-                  <td className="p-2 border break-words whitespace-normal">
-                    <ReadMore text={t.report} />
-                  </td>
-                </tr>
-              ))}
+              {tasks.map((t) => {
+                const status = (t.status || "pending").toLowerCase().trim();
+                const statusColor =
+                  status === "completed" ? "text-green-600" : "text-orange-600";
+
+                return (
+                  <tr key={t._id} className="hover:bg-gray-50">
+                    <td className="p-2 border break-words">{t.title}</td>
+                    <td className="p-2 border break-words whitespace-normal">
+                      <ReadMore text={t.description} />
+                    </td>
+                    <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
+                    <td className={`p-2 border capitalize break-words font-semibold ${statusColor}`}>
+                      {status}
+                    </td>
+                    <td className="p-2 border break-words whitespace-normal">
+                      <ReadMore text={t.report} />
+                    </td>
+                  </tr>
+                );
+              })}
               {tasks.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-4 text-center text-gray-500">
@@ -544,7 +545,6 @@ export default function AdminHRDashboard() {
           </table>
         </div>
       </div>
-
     </div>
   );
 }
