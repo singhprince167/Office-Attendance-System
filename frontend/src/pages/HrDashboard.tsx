@@ -1,4 +1,4 @@
-
+// src/pages/AdminHRDashboard.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
@@ -270,7 +270,7 @@ export default function AdminHRDashboard() {
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-4">
         <h1 className="text-2xl font-bold mb-2 sm:mb-0 text-gray-800">
-          Hr Dashboard
+          Admin Dashboard
         </h1>
         <div className="flex gap-2 flex-wrap">
           <button
