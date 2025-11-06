@@ -37,7 +37,8 @@ export default function UserDashboard() {
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : `http://${window.location.hostname}:5000`;
+      : "https://office-attendance-system-backend.onrender.com";
+
 
   // Wrap functions in useCallback
   const fetchUserProfile = useCallback(async () => {
@@ -152,7 +153,7 @@ export default function UserDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold text-gray-800">
-           {user?.name || ""} 
+          {user?.name || ""}
         </h1>
         <button
           onClick={handleLogout}
