@@ -70,7 +70,8 @@ export default function AdminHRDashboard() {
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : `http://${window.location.hostname}:5000`;
+      : "https://office-attendance-system-backend.onrender.com";
+
 
   const fetchAll = useCallback(async () => {
     try {
@@ -521,69 +522,69 @@ export default function AdminHRDashboard() {
       </div>
 
       {/* Tasks Table */}
-<div className="bg-white p-4 rounded shadow mb-6">
-  <h2 className="text-lg font-semibold mb-2 text-gray-700">
-    All Tasks (Pending & Completed)
-  </h2>
-  <div className="overflow-x-auto overflow-y-auto max-h-[50vh] border rounded">
-    <table className="w-full border-collapse table-auto text-sm sm:text-base min-w-[900px]">
-      <thead className="bg-gray-200 sticky top-0 z-20">
-        <tr>
-          <th className="p-2 border">Title</th>
-          <th className="p-2 border">Description</th>
-          <th className="p-2 border">Assignee</th>
-          <th className="p-2 border">Status</th>
-          <th className="p-2 border">Report</th>
-          <th className="p-2 border">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-            {tasks.map((t) => {
-              const status = (t.status || "pending").toLowerCase().trim();
-              const statusColor =
-                status === "completed" ? "text-green-600" : "text-orange-600";
+      <div className="bg-white p-4 rounded shadow mb-6">
+        <h2 className="text-lg font-semibold mb-2 text-gray-700">
+          All Tasks (Pending & Completed)
+        </h2>
+        <div className="overflow-x-auto overflow-y-auto max-h-[50vh] border rounded">
+          <table className="w-full border-collapse table-auto text-sm sm:text-base min-w-[900px]">
+            <thead className="bg-gray-200 sticky top-0 z-20">
+              <tr>
+                <th className="p-2 border">Title</th>
+                <th className="p-2 border">Description</th>
+                <th className="p-2 border">Assignee</th>
+                <th className="p-2 border">Status</th>
+                <th className="p-2 border">Report</th>
+                <th className="p-2 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tasks.map((t) => {
+                const status = (t.status || "pending").toLowerCase().trim();
+                const statusColor =
+                  status === "completed" ? "text-green-600" : "text-orange-600";
 
-              return (
-                <tr key={t._id} className="hover:bg-gray-50">
-                  <td className="p-2 border break-words">{t.title}</td>
-                  <td className="p-2 border break-words whitespace-normal">
-                    <ReadMore text={t.description} />
-                  </td>
-                  <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
-                  <td className={`p-2 border capitalize break-words font-semibold ${statusColor}`}>
-                    {status}
-                  </td>
-                  <td className="p-2 border break-words whitespace-normal">
-                    <ReadMore text={t.report} />
-                  </td>
-                  <td className="p-2 border flex gap-1">
-                    <button
-                      onClick={() => setViewTask(t)}
-                      className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
-                    >
-                      View Report
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTask(t._id)}
-                      className="bg-red-600 text-white px-2 py-1 rounded text-xs"
-                    >
-                      Delete
-                    </button>
+                return (
+                  <tr key={t._id} className="hover:bg-gray-50">
+                    <td className="p-2 border break-words">{t.title}</td>
+                    <td className="p-2 border break-words whitespace-normal">
+                      <ReadMore text={t.description} />
+                    </td>
+                    <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
+                    <td className={`p-2 border capitalize break-words font-semibold ${statusColor}`}>
+                      {status}
+                    </td>
+                    <td className="p-2 border break-words whitespace-normal">
+                      <ReadMore text={t.report} />
+                    </td>
+                    <td className="p-2 border flex gap-1">
+                      <button
+                        onClick={() => setViewTask(t)}
+                        className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
+                      >
+                        View Report
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTask(t._id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {tasks.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-4 text-center text-gray-500">
+                    No tasks found
                   </td>
                 </tr>
-              );
-            })}
-            {tasks.length === 0 && (
-              <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-500">
-                  No tasks found
-                </td>
-              </tr>
-            )}
-          </tbody>
-    </table>
-  </div>
-</div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
     </div>
   );
