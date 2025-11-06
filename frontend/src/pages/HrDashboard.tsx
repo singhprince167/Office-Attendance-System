@@ -1,4 +1,4 @@
-// src/pages/AdminHRDashboard.tsx
+
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
@@ -63,16 +63,15 @@ export default function AdminHRDashboard() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
+  const [viewTask, setViewTask] = useState<ITask | null>(null);
 
   const token = localStorage.getItem("token");
 
   const BASE_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "https://office-attendance-system-backend.onrender.com";
+      : `http://${window.location.hostname}:5000`;
 
-
-  // ✅ Wrap fetchAll with useCallback to fix ESLint warning
   const fetchAll = useCallback(async () => {
     try {
       const resUsers = await axios.get(`${BASE_URL}/api/auth/users`, {
@@ -92,15 +91,13 @@ export default function AdminHRDashboard() {
     } catch (err) {
       console.error("fetchAll error:", err);
     }
-  }, [BASE_URL, token]); // ✅ Dependencies added
+  }, [BASE_URL, token]);
 
-  // Logout function
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/";
   };
 
-  // Auto-logout logic for inactivity (10 minutes)
   useEffect(() => {
     let timeout: NodeJS.Timeout;
 
@@ -109,7 +106,7 @@ export default function AdminHRDashboard() {
       timeout = setTimeout(() => {
         alert("You have been logged out due to inactivity.");
         handleLogout();
-      }, 2 * 60 * 1000); // 2 minutes
+      }, 2 * 60 * 1000);
     };
 
     window.addEventListener("mousemove", resetTimer);
@@ -128,12 +125,10 @@ export default function AdminHRDashboard() {
     };
   }, []);
 
-  // ✅ useEffect updated with fetchAll dependency
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
 
-  // Register new user
   const registerUser = async () => {
     if (!newUserName || !newUserEmail || !newUserPassword)
       return alert("All fields required");
@@ -159,7 +154,6 @@ export default function AdminHRDashboard() {
     }
   };
 
-  // Assign task to user
   const assignTask = async () => {
     if (!title || !desc || !assignee) return alert("Fill all fields!");
     try {
@@ -178,7 +172,21 @@ export default function AdminHRDashboard() {
     }
   };
 
-  // Utilities for editing attendance
+  const handleDeleteTask = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    try {
+      await axios.delete(`${BASE_URL}/api/tasks/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("Task deleted!");
+      fetchAll();
+    } catch (err) {
+      console.error("delete task error:", err);
+      alert("Failed to delete task.");
+    }
+  };
+
+  // Attendance helpers
   const toTimeInputValue = (t?: string | Date | null) => {
     if (!t) return "";
     if (typeof t === "string") {
@@ -242,9 +250,8 @@ export default function AdminHRDashboard() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this attendance?"))
-      return;
+  const handleDeleteAttendance = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this attendance?")) return;
     try {
       await axios.delete(`${BASE_URL}/api/attendance/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -257,13 +264,12 @@ export default function AdminHRDashboard() {
     }
   };
 
-  // Render dashboard UI
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen font-sans">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-4">
         <h1 className="text-2xl font-bold mb-2 sm:mb-0 text-gray-800">
-          Admin Dashboard
+          Hr Dashboard
         </h1>
         <div className="flex gap-2 flex-wrap">
           <button
@@ -321,6 +327,23 @@ export default function AdminHRDashboard() {
                 Register
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Task Modal */}
+      {viewTask && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow w-full max-w-lg relative">
+            <h2 className="text-xl font-semibold mb-2">{viewTask.title}</h2>
+            <p className="mb-2"><strong>Description:</strong> {viewTask.description}</p>
+            <p className="mb-4"><strong>Report:</strong> {viewTask.report || "-"}</p>
+            <button
+              onClick={() => setViewTask(null)}
+              className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
@@ -476,7 +499,7 @@ export default function AdminHRDashboard() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(a._id)}
+                        onClick={() => handleDeleteAttendance(a._id)}
                         className="bg-red-600 text-white px-2 py-1 rounded text-xs"
                       >
                         Delete
@@ -498,54 +521,70 @@ export default function AdminHRDashboard() {
       </div>
 
       {/* Tasks Table */}
-      <div className="bg-white p-4 rounded shadow max-h-[60vh]">
-        <h2 className="text-lg font-semibold mb-2 text-gray-700">
-          All Tasks (Pending & Completed)
-        </h2>
-        <div className="overflow-x-auto overflow-y-auto max-h-[50vh]">
-          <table className="w-full border text-sm sm:text-base table-auto">
-            <thead className="bg-gray-200 sticky top-0 z-20">
-              <tr>
-                <th className="p-2 border">Title</th>
-                <th className="p-2 border">Description</th>
-                <th className="p-2 border">Assignee</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Report</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map((t) => {
-                const status = (t.status || "pending").toLowerCase().trim();
-                const statusColor =
-                  status === "completed" ? "text-green-600" : "text-orange-600";
+<div className="bg-white p-4 rounded shadow mb-6">
+  <h2 className="text-lg font-semibold mb-2 text-gray-700">
+    All Tasks (Pending & Completed)
+  </h2>
+  <div className="overflow-x-auto overflow-y-auto max-h-[50vh] border rounded">
+    <table className="w-full border-collapse table-auto text-sm sm:text-base min-w-[900px]">
+      <thead className="bg-gray-200 sticky top-0 z-20">
+        <tr>
+          <th className="p-2 border">Title</th>
+          <th className="p-2 border">Description</th>
+          <th className="p-2 border">Assignee</th>
+          <th className="p-2 border">Status</th>
+          <th className="p-2 border">Report</th>
+          <th className="p-2 border">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+            {tasks.map((t) => {
+              const status = (t.status || "pending").toLowerCase().trim();
+              const statusColor =
+                status === "completed" ? "text-green-600" : "text-orange-600";
 
-                return (
-                  <tr key={t._id} className="hover:bg-gray-50">
-                    <td className="p-2 border break-words">{t.title}</td>
-                    <td className="p-2 border break-words whitespace-normal">
-                      <ReadMore text={t.description} />
-                    </td>
-                    <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
-                    <td className={`p-2 border capitalize break-words font-semibold ${statusColor}`}>
-                      {status}
-                    </td>
-                    <td className="p-2 border break-words whitespace-normal">
-                      <ReadMore text={t.report} />
-                    </td>
-                  </tr>
-                );
-              })}
-              {tasks.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-500">
-                    No tasks found
+              return (
+                <tr key={t._id} className="hover:bg-gray-50">
+                  <td className="p-2 border break-words">{t.title}</td>
+                  <td className="p-2 border break-words whitespace-normal">
+                    <ReadMore text={t.description} />
+                  </td>
+                  <td className="p-2 border break-words">{t.assignee?.name || "-"}</td>
+                  <td className={`p-2 border capitalize break-words font-semibold ${statusColor}`}>
+                    {status}
+                  </td>
+                  <td className="p-2 border break-words whitespace-normal">
+                    <ReadMore text={t.report} />
+                  </td>
+                  <td className="p-2 border flex gap-1">
+                    <button
+                      onClick={() => setViewTask(t)}
+                      className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      View Report
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTask(t._id)}
+                      className="bg-red-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              );
+            })}
+            {tasks.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-4 text-center text-gray-500">
+                  No tasks found
+                </td>
+              </tr>
+            )}
+          </tbody>
+    </table>
+  </div>
+</div>
+
     </div>
   );
 }
