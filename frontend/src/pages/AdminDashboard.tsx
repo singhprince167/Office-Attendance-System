@@ -422,104 +422,124 @@ export default function AdminHRDashboard() {
       </div>
 
       {/* Attendance Table */}
-      <div className="bg-white p-4 rounded shadow overflow-x-auto max-h-[60vh] mb-6">
-        <h2 className="text-lg font-semibold mb-2 text-gray-700">
+      <div className="bg-white p-4 rounded shadow mb-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-700">
           All Attendance Records
         </h2>
-        <table className="min-w-[800px] w-full border text-sm sm:text-base">
-          <thead className="bg-gray-200 sticky top-0 z-20">
-            <tr>
-              <th className="p-2 border">User</th>
-              <th className="p-2 border">Date</th>
-              <th className="p-2 border">Entry</th>
-              <th className="p-2 border">Exit</th>
-              <th className="p-2 border">Hours</th>
-              <th className="p-2 border">Entry Loc</th>
-              <th className="p-2 border">Exit Loc</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {attendance.map((a) => (
-              <tr key={a._id} className="hover:bg-gray-50">
-                <td className="p-2 border">{a.user?.name || "-"}</td>
-                <td className="p-2 border">{new Date(a.date).toLocaleDateString()}</td>
-                <td className="p-2 border">{a.entryTime ? new Date(a.entryTime).toLocaleTimeString() : "-"}</td>
-                <td className="p-2 border">{a.exitTime ? new Date(a.exitTime).toLocaleTimeString() : "-"}</td>
-                <td className="p-2 border">{a.totalHours || "-"}</td>
-                <td className="p-2 border text-center">
-                  {a.entryLocation ? (
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${a.entryLocation.lat},${a.entryLocation.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="p-2 border text-center">
-                  {a.exitLocation ? (
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${a.exitLocation.lat},${a.exitLocation.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="p-2 border flex gap-1">
-                  {editItem?._id === a._id ? (
-                    <>
-                      <button
-                        onClick={handleUpdate}
-                        className="bg-green-500 text-white px-2 py-1 rounded text-xs"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditItem(null)}
-                        className="bg-gray-500 text-white px-2 py-1 rounded text-xs"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleEdit(a)}
-                        className="bg-yellow-500 text-white px-2 py-1 rounded text-xs"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteAttendance(a._id)}
-                        className="bg-red-600 text-white px-2 py-1 rounded text-xs"
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {attendance.length === 0 && (
+
+        {/* ✅ Only table content scroll karega */}
+        <div className="overflow-y-auto max-h-[60vh]">
+          <table className="min-w-[800px] w-full border text-sm sm:text-base">
+            <thead className="bg-gray-200 sticky top-0 z-20">
               <tr>
-                <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No attendance records
-                </td>
+                <th className="p-2 border">User</th>
+                <th className="p-2 border">Date</th>
+                <th className="p-2 border">Entry</th>
+                <th className="p-2 border">Exit</th>
+                <th className="p-2 border">Hours</th>
+                <th className="p-2 border">Entry Loc</th>
+                <th className="p-2 border">Exit Loc</th>
+                <th className="p-2 border">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {attendance.map((a) => (
+                <tr key={a._id} className="hover:bg-gray-50">
+                  <td className="p-2 border">{a.user?.name || "-"}</td>
+                  <td className="p-2 border">
+                    {new Date(a.date).toLocaleDateString()}
+                  </td>
+                  <td className="p-2 border">
+                    {a.entryTime
+                      ? new Date(a.entryTime).toLocaleTimeString()
+                      : "-"}
+                  </td>
+                  <td className="p-2 border">
+                    {a.exitTime
+                      ? new Date(a.exitTime).toLocaleTimeString()
+                      : "-"}
+                  </td>
+                  <td className="p-2 border">{a.totalHours || "-"}</td>
+
+                  <td className="p-2 border text-center">
+                    {a.entryLocation ? (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${a.entryLocation.lat},${a.entryLocation.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td className="p-2 border text-center">
+                    {a.exitLocation ? (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${a.exitLocation.lat},${a.exitLocation.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td className="p-2 border flex gap-1">
+                    {editItem?._id === a._id ? (
+                      <>
+                        <button
+                          onClick={handleUpdate}
+                          className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditItem(null)}
+                          className="bg-gray-500 text-white px-2 py-1 rounded text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleEdit(a)}
+                          className="bg-yellow-500 text-white px-2 py-1 rounded text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAttendance(a._id)}
+                          className="bg-red-600 text-white px-2 py-1 rounded text-xs"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+
+              {attendance.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="p-4 text-center text-gray-500">
+                    No attendance records
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+
 
       {/* Tasks Table */}
       <div className="bg-white p-4 rounded shadow mb-6">
