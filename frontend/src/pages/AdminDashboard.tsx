@@ -389,36 +389,42 @@ export default function AdminHRDashboard() {
         </div>
 
         {/* All Registered Users */}
-        <div className="bg-white p-4 rounded shadow overflow-auto max-h-[50vh]">
-          <h2 className="text-lg font-semibold mb-2 text-gray-700">
-            All Registered Users
-          </h2>
-          <table className="min-w-[600px] w-full border text-sm sm:text-base">
-            <thead className="bg-gray-200 sticky top-0 z-20">
-              <tr>
-                <th className="p-2 border">Name</th>
-                <th className="p-2 border">Email</th>
-                <th className="p-2 border">Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u._id} className="hover:bg-gray-50">
-                  <td className="p-2 border">{u.name}</td>
-                  <td className="p-2 border">{u.email}</td>
-                  <td className="p-2 border">{u.role}</td>
-                </tr>
-              ))}
-              {users.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="p-4 text-center text-gray-500">
-                    No users found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+<div className="bg-white p-4 rounded shadow mb-6">
+  {/* Heading stays fixed */}
+  <h2 className="text-lg font-semibold mb-2 text-gray-700">
+    All Registered Users
+  </h2>
+
+  {/* Scrollable table only */}
+  <div className="overflow-auto max-h-[50vh]">
+    <table className="min-w-[600px] w-full border text-sm sm:text-base">
+      <thead className="bg-gray-200 sticky top-0 z-20">
+        <tr>
+          <th className="p-2 border">Name</th>
+          <th className="p-2 border">Email</th>
+          <th className="p-2 border">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map((u) => (
+          <tr key={u._id} className="hover:bg-gray-50">
+            <td className="p-2 border">{u.name}</td>
+            <td className="p-2 border">{u.email}</td>
+            <td className="p-2 border">{u.role}</td>
+          </tr>
+        ))}
+        {users.length === 0 && (
+          <tr>
+            <td colSpan={3} className="p-4 text-center text-gray-500">
+              No users found
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+
       </div>
 
       {/* Attendance Table */}
